@@ -3,14 +3,14 @@ defaults:
   - method: maml
 
 model: FCNet
-n_way: ???
-n_shot: ???
-n_query: ???
+n_way: 2
+n_shot: 3
+n_query: 4
 
 mode: train
 
 exp:
-  name: ???
+  name: "maml-test"
   save_freq: 10
   resume: false
   seed: 42
@@ -28,8 +28,8 @@ checkpoint:
   time: latest
 
 wandb:
-  project: ???
-  entity: ???
+  project: dl-bio
+  entity: s194378
   mode: "online" # Can set to offline, disabled
 
 iter_num: 600
