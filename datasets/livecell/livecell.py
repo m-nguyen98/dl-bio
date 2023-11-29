@@ -1,36 +1,54 @@
-from abc import ABC
-
 import numpy as np
+import torchvision.transforms.functional as TF
+from PIL import Image
 from torch.utils.data import DataLoader
 
 from datasets.dataset import *
 
-class LCDataset(FewShotDataset, ABC):
+class LCDataset(FewShotDataset):
     _dataset_name = 'livecell'
     _dataset_url = 'http://livecell-dataset.s3.eu-central-1.amazonaws.com/LIVECell_dataset_2021/images.zip'
     
-    def load_tabular_muris(self, mode='train', min_samples=20):
-        train_cell_types = []
-        val_cell_types = []
-        test_cell_types = []
+    def __init__(self, batch_size, root='./data/', mode='train', min_samples=20):
+        self.initialize_data_dir(root, download_flag=False)
+        self.file_names, self.labels = self.load_livecell(mode, min_samples)
+        self.batch_size = batch_size
+        super().__init__()
+        
+    def __getitem__(self, i):
+        filename = self.file_names[i]
+        img = Image.open(filename)
+        tensor_input = TF.to_tensor(filename)
+        return tensor_input, self.labels[i]
+    
+    def __len__(self):
+        return len(self.file_names)
+    
+    @property
+    def dim(self):
+        return 366080
+    
+    def get_data_loader(self) -> DataLoader:
+        data_loader_params = dict(batch_size=self.batch_size, shuffle=True, num_workers=4, pin_memory=True)
+        data_loader = torch.utils.data.DataLoader(self, **data_loader_params)
+
+        return data_loader
+    
+    def load_livecell(self, mode='train', min_samples=20):
+        train_cell_types = ["A172", "BT474", "BV2", "Huh7"]
+        val_cell_types = ["MCF7", "SHSY5Y"]
+        test_cell_types = ["SkBr3", "SKOV3"]
         split = {'train': train_cell_types,
                  'val': val_cell_types,
                  'test': test_cell_types}
     
         cell_types = split[mode]
         
-        # subset data based on target cell type
-        adata = adata[adata.obs['tissue'].isin(tissues)]
-
-        filtered_index = adata.obs.groupby(["label"]) \
-            .filter(lambda group: len(group) >= min_samples) \
-            .reset_index()['index']
-        adata = adata[filtered_index]
-
-        # convert gene to torch tensor x
-        samples = adata.to_df().to_numpy(dtype=np.float32)
-        # convert label to torch tensor y
-        targets = adata.obs['label'].cat.codes.to_numpy(dtype=np.int32)
-        # go2gene = get_go2gene(adata=adata, GO_min_genes=32, GO_max_genes=None, GO_min_level=6, GO_max_level=1)
-        # go_mask = create_go_mask(adata, go2gene)
-        return samples, targets
+        file_names = []
+        labels = []
+        for filename in os.listdir(self._data_dir):
+            if filename.endswith('tif') :
+                file_names.append(filename)
+                labels.append(filename.split('_')[0])
+        
+        return file_names, labels
