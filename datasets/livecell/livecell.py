@@ -1,13 +1,18 @@
 import numpy as np
 import torchvision.transforms.functional as TF
 from PIL import Image
+import torchvision.transforms as T
 from torch.utils.data import DataLoader
+import matplotlib.pyplot as plt
 
 from datasets.dataset import *
 
 class LCDataset(FewShotDataset):
     _dataset_name = 'livecell'
     _dataset_url = 'http://livecell-dataset.s3.eu-central-1.amazonaws.com/LIVECell_dataset_2021/images.zip'
+    transform = T.Compose([
+        T.ToPILImage(),
+        T.ToTensor()])
     
     def __init__(self, batch_size, root='./data/', mode='train', min_samples=20):
         self.initialize_data_dir(root, download_flag=False)
@@ -16,10 +21,11 @@ class LCDataset(FewShotDataset):
         super().__init__()
         
     def __getitem__(self, i):
-        filename = self.file_names[i]
+        filename = os.path.join(self._data_dir, self.file_names[i])
         img = Image.open(filename)
-        tensor_input = TF.to_tensor(filename)
-        return tensor_input, self.labels[i]
+        tensor_input = TF.to_tensor(img)
+        X = self.transform(tensor_input)
+        return X, self.labels[i]
     
     def __len__(self):
         return len(self.file_names)
