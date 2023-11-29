@@ -14,30 +14,60 @@ class LCDataset(FewShotDataset):
         T.ToPILImage(),
         T.ToTensor()])
     
-    def __init__(self, batch_size, root='./data/', mode='train', min_samples=20):
+    def __init__(self, n_way, n_support, n_query, n_episode=100, root='./data/', mode='train', min_samples=20):
         self.initialize_data_dir(root, download_flag=False)
+        
+        self.n_way = n_way
+        self.n_episode = n_episode
+        min_samples = n_support + n_query
+        
         self.file_names, self.labels = self.load_livecell(mode, min_samples)
-        self.batch_size = batch_size
+        self.categories = np.unique(self.labels)  # Unique cell labels
+        self.x_dim = 366080
+        
+        self.sub_dataloader = []
+
+        sub_data_loader_params = dict(batch_size=min_samples,
+                                      shuffle=True,
+                                      num_workers=0,  # use main thread only or may receive multiple batches
+                                      pin_memory=False)
+        
+        for cl in self.categories:
+            cl_list = []
+            for filename in self.file_names:
+                file_label = filename.split('_')[0]
+                if file_label == cl:
+                    cl_list.append(filename)
+                    
+            sub_dataset = FewShotSubDataset(np.array(cl_list), cl)
+            self.sub_dataloader.append(torch.utils.data.DataLoader(sub_dataset, **sub_data_loader_params))
+
         super().__init__()
         
     def __getitem__(self, i):
-        filename = os.path.join(self._data_dir, self.file_names[i])
-        img = Image.open(filename)
-        tensor_input = TF.to_tensor(img)
-        X = self.transform(tensor_input)
-        return X, self.labels[i]
+        batch_filenames, batch_labels = next(iter(self.sub_dataloader[i]))
+        
+        x_list = []
+        for name, label in zip(batch_filenames, batch_labels):
+            filename = os.path.join(self._data_dir, name)
+            img = Image.open(filename)
+            tensor_input = TF.to_tensor(img)
+            X = torch.squeeze(self.transform(tensor_input))
+            x_list.append(X)
+           
+        return x_list, batch_labels
     
     def __len__(self):
-        return len(self.file_names)
+        return len(self.categories)
     
     @property
     def dim(self):
-        return 366080
+        return self.x_dim
     
     def get_data_loader(self) -> DataLoader:
-        data_loader_params = dict(batch_size=self.batch_size, shuffle=True, num_workers=4, pin_memory=True)
+        sampler = EpisodicBatchSampler(len(self), self.n_way, self.n_episode)
+        data_loader_params = dict(batch_sampler=sampler, num_workers=4, pin_memory=True)
         data_loader = torch.utils.data.DataLoader(self, **data_loader_params)
-
         return data_loader
     
     def load_livecell(self, mode='train', min_samples=20):
@@ -53,8 +83,9 @@ class LCDataset(FewShotDataset):
         file_names = []
         labels = []
         for filename in os.listdir(self._data_dir):
-            if filename.endswith('tif') :
+            file_label = filename.split('_')[0]
+            if filename.endswith('tif') and file_label in cell_types:
                 file_names.append(filename)
-                labels.append(filename.split('_')[0])
+                labels.append(file_label)
         
         return file_names, labels
