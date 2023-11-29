@@ -1,0 +1,4 @@
+- exp.name=test
+- method=maml
+- dataset=swissprot
+- mode=test
