@@ -1,0 +1,27 @@
+# @package _global_
+
+defaults:
+  - classification_base
+
+
+dataset:
+  name: livecell
+  simple_cls:
+    _target_: datasets.livecell.livecell.LCDataset
+
+  set_cls:
+    _target_: datasets.livecell.livecell.LCDataset
+
+backbone:
+  _target_: backbones.resnet.ResNet
+  block: ResNet50
+  list_of_num_layers: [3, 4, 6, 3]
+  list_of_out_dims: [64, 128, 256, 512]
+
+
+train_classes: 4
+
+n_way: 5
+n_shot: 5
+n_query: 15
+

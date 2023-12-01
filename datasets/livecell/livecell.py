@@ -23,7 +23,7 @@ class LCDataset(FewShotDataset):
         
         self.file_names, self.labels = self.load_livecell(mode, min_samples)
         self.categories = np.unique(self.labels)  # Unique cell labels
-        self.x_dim = 366080
+        self.x_dim = (1, 704, 520)
         
         self.sub_dataloader = []
 
