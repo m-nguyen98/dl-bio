@@ -14,7 +14,60 @@ class LCDataset(FewShotDataset):
         T.ToPILImage(),
         T.ToTensor()])
     
-    def __init__(self, n_way, n_support, n_query, n_episode=100, root='./data/', mode='train', min_samples=20):
+    def load_livecell(self, mode='train', min_samples=20):
+        train_cell_types = ["A172", "BT474", "BV2", "Huh7"]
+        val_cell_types = ["MCF7", "SHSY5Y"]
+        test_cell_types = ["SkBr3", "SKOV3"]
+        split = {'train': train_cell_types,
+                 'val': val_cell_types,
+                 'test': test_cell_types}
+    
+        cell_types = split[mode]
+        
+        file_names = []
+        labels = []
+        for filename in os.listdir(self._data_dir):
+            file_label = filename.split('_')[0]
+            if filename.endswith('tif') and file_label in cell_types:
+                file_names.append(filename)
+                labels.append(file_label)
+    
+        return file_names, labels
+    
+    
+class LCSimpleDataset(LCDataset):
+    def __init__(self, batch_size, root='./data/', mode='train', min_samples=20):
+        self.initialize_data_dir(root, download_flag=False)
+        self.samples, self.targets = self.load_livecell(mode, min_samples)
+        self.batch_size = batch_size 
+        self.x_dim = (704, 520)
+        
+        super().__init__()
+        
+    def __getitem__(self, i):
+        filename = os.path.join(self._data_dir, self.samples[i])
+        img = Image.open(filename)
+        tensor_input = TF.to_tensor(img)
+        X = torch.squeeze(self.transform(tensor_input))
+        
+        return X, self.targets[i]
+    
+    
+    def __len__(self):
+        return len(self.samples)
+    
+    @property
+    def dim(self):
+        return self.x_dim
+    
+    def get_data_loader(self) -> DataLoader:
+        data_loader_params = dict(batch_size=self.batch_size, shuffle=True, num_workers=4, pin_memory=True)
+        data_loader = torch.utils.data.DataLoader(self, **data_loader_params)
+
+        return data_loader
+
+class LCSetDataset(LCDataset):
+    def __init__(self, n_way, n_support, n_query, n_episode=100, root='./data', mode='train'):
         self.initialize_data_dir(root, download_flag=False)
         
         self.n_way = n_way
@@ -23,7 +76,6 @@ class LCDataset(FewShotDataset):
         
         self.file_names, self.labels = self.load_livecell(mode, min_samples)
         self.categories = np.unique(self.labels)  # Unique cell labels
-        self.x_dim = (1, 704, 520)
         
         self.sub_dataloader = []
 
@@ -70,22 +122,3 @@ class LCDataset(FewShotDataset):
         data_loader = torch.utils.data.DataLoader(self, **data_loader_params)
         return data_loader
     
-    def load_livecell(self, mode='train', min_samples=20):
-        train_cell_types = ["A172", "BT474", "BV2", "Huh7"]
-        val_cell_types = ["MCF7", "SHSY5Y"]
-        test_cell_types = ["SkBr3", "SKOV3"]
-        split = {'train': train_cell_types,
-                 'val': val_cell_types,
-                 'test': test_cell_types}
-    
-        cell_types = split[mode]
-        
-        file_names = []
-        labels = []
-        for filename in os.listdir(self._data_dir):
-            file_label = filename.split('_')[0]
-            if filename.endswith('tif') and file_label in cell_types:
-                file_names.append(filename)
-                labels.append(file_label)
-        
-        return file_names, labels
