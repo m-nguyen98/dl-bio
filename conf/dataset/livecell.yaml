@@ -7,10 +7,10 @@ defaults:
 dataset:
   name: livecell
   simple_cls:
-    _target_: datasets.livecell.livecell.LCDataset
+    _target_: datasets.livecell.livecell.LCSimpleDataset
 
   set_cls:
-    _target_: datasets.livecell.livecell.LCDataset
+    _target_: datasets.livecell.livecell.LCSetDataset
 
 backbone:
   _target_: backbones.resnet.ResNet
