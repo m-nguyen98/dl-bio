@@ -12,11 +12,11 @@ class ResNet(nn.Module):
         super(ResNet, self).__init__()
         assert len(list_of_num_layers) == 4, 'Can have only four stages'
         if self.maml:
-            conv1 = Conv2d_fw(3, 64, kernel_size=7, stride=2, padding=3,
+            conv1 = Conv2d_fw(1, 64, kernel_size=7, stride=2, padding=3,
                               bias=False)
             bn1 = BatchNorm2d_fw(64)
         else:
-            conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
+            conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3,
                               bias=False)
             bn1 = nn.BatchNorm2d(64)
 
