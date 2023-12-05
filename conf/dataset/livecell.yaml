@@ -13,11 +13,8 @@ dataset:
     _target_: datasets.livecell.livecell.LCSetDataset
 
 backbone:
-  _target_: backbones.resnet.ResNet
-  block: ResNet50
-  list_of_num_layers: [3, 4, 6, 3]
-  list_of_out_dims: [64, 128, 256, 512]
-
+  _target_: backbones.resnet.ResNet10
+  
 
 train_classes: 4
 
