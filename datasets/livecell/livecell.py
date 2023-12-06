@@ -12,8 +12,11 @@ class LCDataset(FewShotDataset):
     _dataset_url = 'http://livecell-dataset.s3.eu-central-1.amazonaws.com/LIVECell_dataset_2021/images.zip'
     transform = T.Compose([
         T.ToPILImage(),
+        T.RandomResizedCrop((224,224)),
         T.ToTensor()])
     x_dim = 366080
+    mapping = ["A172", "BT474", "BV2", "Huh7", "MCF7", "SHSY5Y", "SkBr3", "SKOV3"]
+
     
     def load_livecell(self, mode='train', min_samples=20):
         train_cell_types = ["A172", "BT474", "BV2", "Huh7"]
@@ -41,7 +44,7 @@ class LCSimpleDataset(LCDataset):
         self.initialize_data_dir(root, download_flag=False)
         self.samples, self.targets = self.load_livecell(mode, min_samples)
         self.batch_size = batch_size 
-        self.x_dim = (704, 520)
+        self.x_dim = 366080
         
         super().__init__()
         
@@ -50,6 +53,7 @@ class LCSimpleDataset(LCDataset):
         img = Image.open(filename)
         tensor_input = TF.to_tensor(img)
         X = torch.squeeze(self.transform(tensor_input))
+        X = X.unsqueeze(0)
         
         return X, self.targets[i]
     
@@ -84,7 +88,7 @@ class LCSetDataset(LCDataset):
                                       shuffle=True,
                                       num_workers=0,  # use main thread only or may receive multiple batches
                                       pin_memory=False)
-        
+
         for cl in self.categories:
             cl_list = []
             for filename in self.file_names:
@@ -92,7 +96,7 @@ class LCSetDataset(LCDataset):
                 if file_label == cl:
                     cl_list.append(filename)
                     
-            sub_dataset = FewShotSubDataset(np.array(cl_list), cl)
+            sub_dataset = FewShotSubDataset(np.array(cl_list), self.mapping.index(cl))
             self.sub_dataloader.append(torch.utils.data.DataLoader(sub_dataset, **sub_data_loader_params))
 
         super().__init__()
@@ -106,6 +110,7 @@ class LCSetDataset(LCDataset):
             img = Image.open(filename)
             tensor_input = TF.to_tensor(img)
             X = torch.squeeze(self.transform(tensor_input))
+            X = X.unsqueeze(0)
             x_list.append(X)
            
         return x_list, batch_labels
