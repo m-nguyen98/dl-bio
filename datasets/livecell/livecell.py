@@ -15,8 +15,6 @@ class LCDataset(FewShotDataset):
         T.RandomResizedCrop((224,224)),
         T.ToTensor()])
     x_dim = 366080
-    mapping = ["A172", "BT474", "BV2", "Huh7", "MCF7", "SHSY5Y", "SkBr3", "SKOV3"]
-
     
     def load_livecell(self, mode='train', min_samples=20):
         train_cell_types = ["A172", "BT474", "BV2", "Huh7"]
@@ -34,7 +32,7 @@ class LCDataset(FewShotDataset):
             file_label = filename.split('_')[0]
             if filename.endswith('tif') and file_label in cell_types:
                 file_names.append(filename)
-                labels.append(file_label)
+                labels.append(self.mapping.index(file_label))
     
         return file_names, labels
     
