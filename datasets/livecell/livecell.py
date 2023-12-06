@@ -13,6 +13,7 @@ class LCDataset(FewShotDataset):
     transform = T.Compose([
         T.ToPILImage(),
         T.ToTensor()])
+    x_dim = 366080
     
     def load_livecell(self, mode='train', min_samples=20):
         train_cell_types = ["A172", "BT474", "BV2", "Huh7"]
