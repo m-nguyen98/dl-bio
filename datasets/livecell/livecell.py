@@ -103,11 +103,8 @@ class LCSetDataset(LCDataset):
         
     def __getitem__(self, i):
         batch_filenames, batch_labels = next(iter(self.sub_dataloader[i]))
-        print('we get here:', batch_filenames)
         
         x_list = []
-        #print("here is labels:", batch_labels)
-        
         for name, label in zip(batch_filenames, batch_labels):
             filename = os.path.join(self._data_dir, name)
             img = Image.open(filename)
@@ -115,8 +112,11 @@ class LCSetDataset(LCDataset):
             X = torch.squeeze(self.transform(tensor_input))
             X = X.unsqueeze(0)
             x_list.append(X)
-           
-        return x_list, batch_labels
+            
+        x = torch.cat(x_list, dim=0)
+        x = x.unsqueeze(1)
+        
+        return x, batch_labels
     
     def __len__(self):
         return len(self.categories)

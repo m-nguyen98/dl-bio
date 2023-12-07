@@ -47,9 +47,6 @@ class ResNet(nn.Module):
         self.trunk = nn.Sequential(*trunk)
 
     def forward(self, x):
-        if (type(x))==list:
-            print(len(x))
-        print('getting this far:', x)
         out = self.trunk(x)
         return out
 
