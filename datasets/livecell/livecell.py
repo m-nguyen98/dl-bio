@@ -138,6 +138,67 @@ class LCSetDataset(LCDataset):
         return self.x_dim
     
     def get_data_loader(self) -> DataLoader:
+        sampler = EpisodicBatchSampler(len(self.sub_dataloader), self.n_way, self.n_episode)
+        data_loader_params = dict(batch_sampler=sampler, num_workers=4, pin_memory=True)
+        data_loader = torch.utils.data.DataLoader(self, **data_loader_params)
+        return data_loader
+    
+
+class TEST_LCSetDataset(LCDataset):
+    def __init__(self, n_way, n_support, n_query, n_episode=100, root='./data', mode='train'):
+        self.initialize_data_dir(root, download_flag=False)
+        
+        self.n_way = n_way
+        self.n_episode = n_episode
+        min_samples = n_support + n_query
+        
+        self.file_names, self.labels = self.load_livecell(mode, min_samples)
+        self.categories = np.unique(self.labels)  # Unique cell labels
+        
+        self.sub_dataloader = []
+
+        sub_data_loader_params = dict(batch_size=min_samples,
+                                      shuffle=True,
+                                      num_workers=0,  # use main thread only or may receive multiple batches
+                                      pin_memory=False)
+
+        for cl in self.categories:
+            cl_list = []
+            for filename in self.file_names:
+                file_label = filename.split('_')[0]
+                if file_label == cl:
+                    cl_list.append(filename)
+                    
+            sub_dataset = FewShotSubDataset(np.array(cl_list), self.mapping.index(cl))
+            self.sub_dataloader.append(torch.utils.data.DataLoader(sub_dataset, **sub_data_loader_params))
+
+        super().__init__()
+        
+    def __getitem__(self, i):
+        batch_filenames, batch_labels = next(iter(self.sub_dataloader[i]))
+        
+        x_list = []
+        for name, label in zip(batch_filenames, batch_labels):
+            filename = os.path.join(self._data_dir, name)
+            img = Image.open(filename)
+            tensor_input = TF.to_tensor(img)
+            X = torch.squeeze(self.transform(tensor_input))
+            X = X.unsqueeze(0)
+            x_list.append(X)
+            
+        x = torch.cat(x_list, dim=0)
+        x = x.unsqueeze(1) # [n_support + n_query, 1, 224, 224]
+        
+        return x, batch_labels
+    
+    def __len__(self):
+        return len(self.categories)
+    
+    @property
+    def dim(self):
+        return self.x_dim
+    
+    def get_data_loader(self) -> DataLoader:
         sampler = EpisodicBatchSampler(len(self), self.n_way, self.n_episode)
         data_loader_params = dict(batch_sampler=sampler, num_workers=4, pin_memory=True)
         data_loader = torch.utils.data.DataLoader(self, **data_loader_params)

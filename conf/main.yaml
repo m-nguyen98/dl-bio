@@ -2,10 +2,10 @@ defaults:
   - dataset: tabula_muris
   - method: maml
 
-model: FCNet
-n_way: 2
+model: ResNet34 #naming of the file
+n_way: 4
 n_shot: 3
-n_query: 4
+n_query: 15
 
 mode: train
 
@@ -32,4 +32,4 @@ wandb:
   entity: s194378
   mode: "online" # Can set to offline, disabled
 
-iter_num: 50
+iter_num: 10
