@@ -21,7 +21,8 @@ backbone:
 
 train_classes: 4
 
-n_way: 5
+n_way: 4
 n_shot: 5
 n_query: 15
 
+ 
