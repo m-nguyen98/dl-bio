@@ -90,14 +90,26 @@ class LCSetDataset(LCDataset):
                                       pin_memory=False)
 
         for cl in self.categories:
-            cl_list = []
+            cl_list0 = []
+            cl_list1 = []
+            cl_list2 = []
             for filename in self.file_names:
                 file_label = filename.split('_')[0]
                 if file_label == cl:
-                    cl_list.append(filename)
+                    file_day = int(filename.split('_')[4][1])
+                    if file_day == 0:
+                        cl_list0.append(filename)
+                    elif file_day == 1:
+                        cl_list1.append(filename)
+                    else:
+                        cl_list2.append(filename)
                     
-            sub_dataset = FewShotSubDataset(np.array(cl_list), self.mapping.index(cl))
-            self.sub_dataloader.append(torch.utils.data.DataLoader(sub_dataset, **sub_data_loader_params))
+            sub_dataset0 = FewShotSubDataset(np.array(cl_list0), self.mapping.index(cl))
+            sub_dataset1 = FewShotSubDataset(np.array(cl_list1), self.mapping.index(cl))
+            sub_dataset2 = FewShotSubDataset(np.array(cl_list2), self.mapping.index(cl))
+            self.sub_dataloader.append(torch.utils.data.DataLoader(sub_dataset0, **sub_data_loader_params))
+            self.sub_dataloader.append(torch.utils.data.DataLoader(sub_dataset1, **sub_data_loader_params))
+            self.sub_dataloader.append(torch.utils.data.DataLoader(sub_dataset2, **sub_data_loader_params))
 
         super().__init__()
         
