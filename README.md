@@ -1,9 +1,7 @@
 # Few Shot Benchmark for Biomedical Datasets
 
 
-## Installation
-
-You have been provided with a `fewshotbench.zip` file containing the code for this benchmark. The accompanying presentation will also help you get started.
+## Getting Started
 
 ### Conda
 
@@ -30,7 +28,7 @@ python -m pip install -r requirements.txt
 
 ## Usage
 
-### Training
+### Training w. LiveCell 
 
 ```bash
 python run.py exp.name={exp_name} method=maml dataset=tabula_muris
