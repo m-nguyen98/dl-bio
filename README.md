@@ -31,7 +31,7 @@ python -m pip install -r requirements.txt
 ### Training w. LiveCell 
 
 ```bash
-python run.py exp.name={exp_name} method=maml dataset=tabula_muris
+python run.py exp.name={exp_name} method=maml dataset=livecell
 ```
 
 By default, method is set to MAML, and dataset is set to Tabula Muris.
@@ -43,7 +43,7 @@ The training process will automatically evaluate at the end. To only evaluate wi
 running training, use the following:
 
 ```bash
-python run.py exp.name={exp_name} method=maml dataset=tabula_muris mode=test
+python run.py exp.name={exp_name} method=maml dataset=livecell mode=test
 ```
 
 Run `run.py` with the same parameters as the training run, with `mode=test` and it will automatically use the
@@ -65,9 +65,7 @@ The provided datasets are:
 
 | Dataset      | Task                             | Modality         | Type           | Source                                                                 |
 |--------------|----------------------------------|------------------|----------------|------------------------------------------------------------------------|
-| Tabula Muris | Cell-type prediction             | Gene expression  | Classification | [Cao et al. (2021)](https://arxiv.org/abs/2007.07375)                  |
-| SwissProt    | Protein function prediction      | Protein sequence | Classification | [Uniprot](https://www.uniprot.org/) |
-
+| Livecell     | Cell-type prediction             | Cell Culture Images  | Classification | [Cao et al. (2021)](https://arxiv.org/abs/2007.07375)              |
 
 ## Methods
 
