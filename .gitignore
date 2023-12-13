@@ -15421,3 +15421,15 @@ wandb/run-20231209_130626-rx0mevl4/logs/debug-internal.log
 wandb/run-20231209_130626-rx0mevl4/logs/debug.log
 methods/__pycache__/baseline.cpython-310.pyc
 methods/__pycache__/maml.cpython-310.pyc
+backbones/__pycache__/resnet.cpython-310.pyc
+checkpoints/livecell_maml/livecell/maml_FCNet/20231209_130624/10.tar
+backbones/__pycache__/resnet.cpython-310.pyc
+.gitignore
+datasets/__pycache__/dataset.cpython-310.pyc
+datasets/cell/__pycache__/tabula_muris.cpython-310.pyc
+datasets/cell/__pycache__/utils.cpython-310.pyc
+datasets/livecell/livecell.py
+datasets/livecell/__pycache__/livecell.cpython-310.pyc
+datasets/prot/__pycache__/__init__.cpython-310.pyc
+datasets/prot/__pycache__/swissprot.cpython-310.pyc
+datasets/prot/__pycache__/utils.cpython-310.pyc

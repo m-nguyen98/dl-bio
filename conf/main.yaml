@@ -3,9 +3,9 @@ defaults:
   - method: maml
 
 model: ResNet34 #naming of the file
-n_way: 4
-n_shot: 3
-n_query: 15
+n_way: 2
+n_shot: 5
+n_query: 16
 
 mode: train
 
@@ -17,7 +17,7 @@ exp:
   val_freq: 1
 
 optimizer: Adam
-lr: 0.0001
+lr: 0.00001
 optimizer_cls:
   _target_: torch.optim.${optimizer}
   lr: ${lr}

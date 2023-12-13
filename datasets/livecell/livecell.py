@@ -133,7 +133,7 @@ class LCSetDataset(LCDataset):
         return data_loader
 
 class Day_LCSetDataset(LCDataset):
-    def __init__(self, n_way, n_support, n_query, n_episode=100, root='./data', mode='train'):
+    def __init__(self, n_way, n_support, n_query, n_episode=10000, root='./data', mode='train'):
         self.initialize_data_dir(root, download_flag=False)
         
         self.n_way = n_way
