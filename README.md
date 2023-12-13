@@ -1,4 +1,4 @@
-# Extending the Few-Shot Benchmark by adding the LIVECell Dataset 
+# Extending the Few-Shot Benchmark by integrating the LIVECell Dataset 
 
 ## Implementation
 
