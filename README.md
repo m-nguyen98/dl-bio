@@ -1,5 +1,72 @@
-# Few Shot Benchmark for Biomedical Datasets
+# Extending the Few-Shot Benchmark by adding the LIVECell Dataset 
 
+
+## Instructions to run our experiments in Google Cloud
+
+We used a high-memory (32GB) machine with 8 cores, and 1 Nvidia T4 GPU. <br>
+
+1. Download conda
+```
+mkdir -p ~/miniconda3
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
+bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+rm -rf ~/miniconda3/miniconda.sh
+```
+
+2. Initialize bash and zsh shells
+```
+~/miniconda3/bin/conda init bash
+~/miniconda3/bin/conda init zsh
+```
+
+3. Download and install CUDA drivers + check if installation is successful
+```
+curl https://raw.githubusercontent.com/GoogleCloudPlatform/compute-gpu-installation/main/linux/install_gpu_driver.py --output install_gpu_driver.py
+sudo python3 install_gpu_driver.py
+nvidia-smi
+```
+
+4. Clone this repo and cd into the project
+```
+git clone https://github.com/m-nguyen98/dl-bio.git
+cd dl-bio
+```
+
+5. Create and activate conda environment
+```
+conda env create -f environment.yml
+conda activate fewshotbench
+```
+
+6. Activate ```wandb``` with ```wandb login``` (change the login entity in ```conf/main.yaml```)
+   
+7. Download LIVECell dataset
+
+# LIVECell Dataset Setup Instructions
+
+## Steps
+
+1. **Download Dataset**
+   - Download the LIVECell dataset using this link: [Download LIVECell dataset](http://livecell-dataset.s3.eu-central-1.amazonaws.com/LIVECell_dataset_2021/images.zip).
+
+2. **Unzip and Organize**
+   - After downloading, unzip the file.
+   - Move the images from `train`, `validation`, and `test` folders to the main directory.
+
+3. **Transfer to VM**
+   - Transfer the LIVECell dataset to your VM using the SCP command:
+     ```
+     scp -r /path/to/LIVECell-dataset user@remote-host:/path/to/destination-directory/
+     ```
+   - Replace `/path/to/LIVECell-dataset` with the path to the LIVECell dataset on your local PC.
+   - Replace `user@remote-host:/path/to/destination-directory/` with your VM's username, host, and the destination directory path.
+
+
+8. Run experiment scripts
+```
+python run.py exp.name={exp_name} method=maml dataset=livecell
+
+```
 
 ## Getting Started
 
