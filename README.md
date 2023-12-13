@@ -1,5 +1,9 @@
 # Extending the Few-Shot Benchmark by adding the LIVECell Dataset 
 
+## Implementation
+
+Our implementation of the customized dataloader for the LIVECell data is located in ```datasets/livecell/livecell.py```. The backbone is set to ResNet34 and can be changed in ```conf/dataset/livecell.yaml```. 
+
 
 ## Instructions to run our experiments in Google Cloud
 
@@ -39,12 +43,11 @@ conda activate fewshotbench
 ```
 
 6. Activate ```wandb``` with ```wandb login``` (change the login entity in ```conf/main.yaml```)
-   
-7. Download LIVECell dataset
 
-# LIVECell Dataset Setup Instructions
 
-## Steps
+## LIVECell Dataset Setup Instructions
+
+### Steps
 
 1. **Download Dataset**
    - Download the LIVECell dataset using this link: [Download LIVECell dataset](http://livecell-dataset.s3.eu-central-1.amazonaws.com/LIVECell_dataset_2021/images.zip).
@@ -62,40 +65,7 @@ conda activate fewshotbench
    - Replace `user@remote-host:/path/to/destination-directory/` with your VM's username, host, and the destination directory path.
 
 
-8. Run experiment scripts
-```
-python run.py exp.name={exp_name} method=maml dataset=livecell
-
-```
-
-## Getting Started
-
-### Conda
-
-Create a conda env and install requirements with:
-
-```bash
-conda env create -f environment.yml 
-```
-
-Before each run, activate the environment with:
-
-```bash
-conda activate few-shot-benchmark 
-```
-
-### Pip
-
-Alternatively, for environments that do not support
-conda (e.g. Google Colab), install requirements with:
-
-```bash
-python -m pip install -r requirements.txt
-```
-
-## Usage
-
-### Training w. LiveCell 
+### Training with LIVECell
 
 ```bash
 python run.py exp.name={exp_name} method=maml dataset=livecell
@@ -104,7 +74,7 @@ python run.py exp.name={exp_name} method=maml dataset=livecell
 By default, method is set to MAML, and dataset is set to Tabula Muris.
 The experiment name must always be specified.
 
-### Testing
+### Testing with LIVECell
 
 The training process will automatically evaluate at the end. To only evaluate without
 running training, use the following:
@@ -117,6 +87,10 @@ Run `run.py` with the same parameters as the training run, with `mode=test` and 
 best checkpoint (as measured by val ACC) from the most recent training run with that combination of
 exp.name/method/dataset/model. To choose a run conducted at a different time (i.e. not the latest), pass in the timestamp
 in the form `checkpoint.time={yyyymmdd_hhmmss}.` To choose a model from a specific epoch, use `checkpoint.iter=40`. 
+
+
+#### Below is the initial README.md content for the existing datasets and methods in the Few-Shot Benchmark
+
 
 ## Datasets
 
@@ -132,7 +106,8 @@ The provided datasets are:
 
 | Dataset      | Task                             | Modality         | Type           | Source                                                                 |
 |--------------|----------------------------------|------------------|----------------|------------------------------------------------------------------------|
-| Livecell     | Cell-type prediction             | Cell Culture Images  | Classification | [Cao et al. (2021)](https://arxiv.org/abs/2007.07375)              |
+| Tabula Muris | Cell-type prediction             | Gene expression  | Classification | [Cao et al. (2021)](https://arxiv.org/abs/2007.07375)                  |
+| SwissProt    | Protein function prediction      | Protein sequence | Classification | [Uniprot](https://www.uniprot.org/) |
 
 ## Methods
 
